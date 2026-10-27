@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dilnaz · Team 2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Syne:wght@800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #07060d;
+    --card: rgba(255,255,255,.05);
+    --line: rgba(255,255,255,.12);
+    --text: #f4f2ff;
+    --muted: #a39fc0;
+    --a: #8b5cf6;
+    --b: #22d3ee;
+    --c: #f472b6;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* фон */
+  canvas#net { position: fixed; inset: 0; z-index: 0; }
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(110px); opacity: .45; z-index: 0;
+    animation: float 16s ease-in-out infinite;
+  }
+  .blob.one { width: 520px; height: 520px; background: var(--a); top: -140px; left: -120px; }
+  .blob.two { width: 460px; height: 460px; background: var(--b); bottom: -160px; right: -100px; animation-delay: -6s; }
+  .blob.three { width: 380px; height: 380px; background: var(--c); top: 40%; left: 55%; opacity: .25; animation-delay: -11s; }
+  @keyframes float {
+    0%,100% { transform: translate(0,0) scale(1); }
+    33% { transform: translate(60px,-50px) scale(1.12); }
+    66% { transform: translate(-50px,60px) scale(.92); }
+  }
+  .cursor-glow {
+    position: fixed; width: 420px; height: 420px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(139,92,246,.22), transparent 65%);
+    pointer-events: none; z-index: 1; transform: translate(-50%,-50%);
+    transition: opacity .3s;
+  }
+
+  main { position: relative; z-index: 2; }
+
+  /* навигация */
+  nav {
+    position: fixed; top: 18px; left: 50%; transform: translateX(-50%);
+    z-index: 10; display: flex; gap: 6px; padding: 8px;
+    background: rgba(12,10,24,.6); backdrop-filter: blur(16px);
+    border: 1px solid var(--line); border-radius: 999px;
+  }
+  nav a {
+    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+    padding: 9px 18px; border-radius: 999px; transition: .25s;
+  }
+  nav a:hover { color: #fff; background: rgba(255,255,255,.1); }
+
+  /* hero */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; padding: 120px 24px 60px;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 18px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--card); backdrop-filter: blur(10px);
+    font-size: 13px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    animation: rise .9s both;
+  }
+  .badge i { width: 8px; height: 8px; border-radius: 50%; background: #34d399; box-shadow: 0 0 12px #34d399; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 50% { opacity: .35; transform: scale(.8); } }
+
+  .hello { margin-top: 34px; font-size: clamp(18px, 2.5vw, 26px); color: var(--muted); animation: rise .9s .15s both; }
+
+  h1.name {
+    font-family: 'Syne', 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: clamp(64px, 17vw, 240px);
+    line-height: .95; letter-spacing: -.04em; margin-top: 6px;
+    background: linear-gradient(110deg, var(--a), var(--b) 35%, var(--c) 70%, var(--a));
+    background-size: 250% auto;
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    animation: shine 6s linear infinite, rise 1s .25s both;
+    filter: drop-shadow(0 0 40px rgba(139,92,246,.35));
+  }
+  @keyframes shine { to { background-position: 250% center; } }
+  @keyframes rise { from { opacity: 0; transform: translateY(36px); } to { opacity: 1; transform: none; } }
+
+  .role {
+    margin-top: 26px; font-size: clamp(18px, 2.8vw, 30px); font-weight: 500;
+    min-height: 1.4em; animation: rise 1s .4s both;
+  }
+  .role span { color: var(--b); }
+  .role .caret { display: inline-block; width: 3px; height: 1em; background: var(--c); margin-left: 4px; vertical-align: -.12em; animation: blink 1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .cta { margin-top: 44px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; animation: rise 1s .55s both; }
+  .btn {
+    padding: 15px 30px; border-radius: 14px; font-weight: 700; font-size: 15px; text-decoration: none;
+    transition: .3s; border: 1px solid var(--line);
+  }
+  .btn.primary { background: linear-gradient(120deg, var(--a), var(--c)); color: #fff; border: none; box-shadow: 0 10px 40px rgba(139,92,246,.4); }
+  .btn.primary:hover { transform: translateY(-4px); box-shadow: 0 16px 50px rgba(244,114,182,.5); }
+  .btn.ghost { color: var(--text); background: var(--card); backdrop-filter: blur(10px); }
+  .btn.ghost:hover { background: rgba(255,255,255,.12); transform: translateY(-4px); }
+
+  .scroll { margin-top: 70px; color: var(--muted); font-size: 12px; letter-spacing: .3em; text-transform: uppercase; animation: rise 1s .8s both; }
+  .scroll::after { content: ''; display: block; width: 1px; height: 46px; margin: 12px auto 0; background: linear-gradient(var(--b), transparent); animation: drop 2s infinite; }
+  @keyframes drop { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+
+  /* секциялар */
+  section.block { max-width: 1100px; margin: 0 auto; padding: 100px 24px; }
+  .eyebrow { color: var(--b); font-size: 13px; letter-spacing: .25em; text-transform: uppercase; font-weight: 700; }
+  h2 { font-family: 'Syne', sans-serif; font-size: clamp(34px, 6vw, 64px); letter-spacing: -.03em; margin: 12px 0 46px; }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: 1s cubic-bezier(.2,.8,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+  .card {
+    position: relative; padding: 32px; border-radius: 24px;
+    background: var(--card); border: 1px solid var(--line); backdrop-filter: blur(14px);
+    overflow: hidden; transition: .4s; transform-style: preserve-3d;
+  }
+  .card::before {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+    background: linear-gradient(135deg, var(--a), transparent 40%, var(--b));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0; transition: .4s;
+  }
+  .card:hover { transform: translateY(-8px); background: rgba(255,255,255,.08); }
+  .card:hover::before { opacity: 1; }
+  .icon {
+    width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center;
+    font-size: 26px; margin-bottom: 22px;
+    background: linear-gradient(135deg, rgba(139,92,246,.35), rgba(34,211,238,.25));
+    border: 1px solid var(--line);
+  }
+  .card h3 { font-size: 22px; margin-bottom: 10px; }
+  .card p { color: var(--muted); line-height: 1.6; font-size: 15px; }
+  code.cmd {
+    display: block; margin-top: 18px; padding: 14px 16px; border-radius: 12px;
+    background: rgba(0,0,0,.45); border: 1px solid var(--line);
+    font-family: ui-monospace, 'Cascadia Code', Consolas, monospace; font-size: 12.5px;
+    color: #a5f3fc; overflow-x: auto; white-space: nowrap;
+  }
+  .tag { display: inline-block; margin-top: 16px; padding: 5px 12px; border-radius: 999px; font-size: 12px; font-weight: 700; background: rgba(52,211,153,.14); color: #34d399; border: 1px solid rgba(52,211,153,.3); }
+
+  /* статистика */
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 22px; }
+  .stat { text-align: center; padding: 34px 20px; border-radius: 24px; background: var(--card); border: 1px solid var(--line); backdrop-filter: blur(14px); }
+  .stat b {
+    display: block; font-family: 'Syne', sans-serif; font-size: 52px;
+    background: linear-gradient(120deg, var(--b), var(--c)); -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .stat span { color: var(--muted); font-size: 14px; }
+
+  /* стек */
+  .chips { display: flex; flex-wrap: wrap; gap: 12px; }
+  .chip {
+    padding: 12px 22px; border-radius: 999px; background: var(--card);
+    border: 1px solid var(--line); font-weight: 500; transition: .3s; cursor: default;
+  }
+  .chip:hover { background: linear-gradient(120deg, var(--a), var(--c)); border-color: transparent; transform: translateY(-4px) rotate(-2deg); }
+
+  footer { position: relative; z-index: 2; text-align: center; padding: 60px 24px 50px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+  footer strong { background: linear-gradient(120deg, var(--a), var(--b), var(--c)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  @media (max-width: 560px) {
+    nav a { padding: 8px 12px; font-size: 13px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    .reveal { opacity: 1; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="net"></canvas>
+<div class="blob one"></div>
+<div class="blob two"></div>
+<div class="blob three"></div>
+<div class="cursor-glow" id="glow"></div>
+
+<nav>
+  <a href="#top">Басты бет</a>
+  <a href="#project">Жоба</a>
+  <a href="#stack">Технологиялар</a>
+</nav>
+
+<main id="top">
+  <header class="hero">
+    <div class="badge"><i></i> Team 2 · Docker Project</div>
+    <p class="hello">Сәлем, менің атым</p>
+    <h1 class="name">DILNAZ</h1>
+    <p class="role"><span id="typed"></span><span class="caret"></span></p>
+    <div class="cta">
+      <a class="btn primary" href="#project">Жобамды көру</a>
+      <a class="btn ghost" href="#stack">Технологиялар</a>
+    </div>
+    <div class="scroll">Төмен түс</div>
+  </header>
+
+  <section class="block" id="project">
+    <div class="eyebrow reveal">Жоба</div>
+    <h2 class="reveal">Docker-де жұмыс істейтін<br>екі контейнер</h2>
+    <div class="grid">
+      <article class="card reveal">
+        <div class="icon">🌐</div>
+        <h3>team2-site</h3>
+        <p>Nginx негізіндегі сайт. Осы бетті Docker контейнері беріп тұр.</p>
+        <code class="cmd">docker run -d -p 9090:80 --name team2-site dilnaz1602/team2-site:1.0</code>
+        <span class="tag">● порт 9090</span>
+      </article>
+      <article class="card reveal">
+        <div class="icon">🗄️</div>
+        <h3>team2-db-data</h3>
+        <p>PostgreSQL дерекқоры, ішінде students кестесі бар.</p>
+        <code class="cmd">docker run -d -p 5434:5432 --name team2-db-data dilnaz1602/team2-db-data:1.0</code>
+        <span class="tag">● порт 5434</span>
+      </article>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="eyebrow reveal">Сандармен</div>
+    <h2 class="reveal">Қысқаша нәтиже</h2>
+    <div class="stats">
+      <div class="stat reveal"><b data-count="2">0</b><span>контейнер</span></div>
+      <div class="stat reveal"><b data-count="2">0</b><span>Docker image</span></div>
+      <div class="stat reveal"><b data-count="9090">0</b><span>сайт порты</span></div>
+      <div class="stat reveal"><b data-count="5434">0</b><span>база порты</span></div>
+    </div>
+  </section>
+
+  <section class="block" id="stack">
+    <div class="eyebrow reveal">Стек</div>
+    <h2 class="reveal">Қолданылған технологиялар</h2>
+    <div class="chips reveal">
+      <span class="chip">🐳 Docker</span>
+      <span class="chip">⚡ Nginx</span>
+      <span class="chip">🐘 PostgreSQL</span>
+      <span class="chip">🐧 Ubuntu</span>
+      <span class="chip">🐙 GitHub</span>
+      <span class="chip">🎨 HTML · CSS · JS</span>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Жасаған: <strong>Dilnaz</strong> · Team 2 · <span id="year"></span>
+</footer>
+
+<script>
+  // жыл
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // жазылу эффектісі
+  const words = ['Docker үйреніп жатырмын', 'Сайт жасаймын', 'Дерекқормен жұмыс істеймін', 'Team 2 мүшесімін'];
+  const el = document.getElementById('typed');
+  let w = 0, c = 0, del = false;
+  (function type() {
+    const word = words[w];
+    el.textContent = word.slice(0, c);
+    if (!del && c === word.length) { del = true; return setTimeout(type, 1500); }
+    if (del && c === 0) { del = false; w = (w + 1) % words.length; }
+    c += del ? -1 : 1;
+    setTimeout(type, del ? 35 : 75);
+  })();
+
+  // курсор жарығы
+  const glow = document.getElementById('glow');
+  addEventListener('mousemove', e => { glow.style.left = e.clientX + 'px'; glow.style.top = e.clientY + 'px'; });
+
+  // карточка 3D еңкею
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - .5;
+      const y = (e.clientY - r.top) / r.height - .5;
+      card.style.transform = `translateY(-8px) perspective(800px) rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+    });
+    card.addEventListener('mouseleave', () => card.style.transform = '');
+  });
+
+  // көріну анимациясы + санауыш
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('in');
+      const n = e.target.querySelector('[data-count]');
+      if (n && !n.dataset.done) {
+        n.dataset.done = 1;
+        const to = +n.dataset.count, start = performance.now(), dur = 1400;
+        (function tick(t) {
+          const p = Math.min((t - start) / dur, 1);
+          n.textContent = Math.round(to * (1 - Math.pow(1 - p, 3)));
+          if (p < 1) requestAnimationFrame(tick);
+        })(start);
+      }
+      io.unobserve(e.target);
+    });
+  }, { threshold: .15 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // бөлшектер желісі
+  const cv = document.getElementById('net'), ctx = cv.getContext('2d');
+  let W, H, pts = [], mouse = { x: -999, y: -999 };
+  function size() {
+    W = cv.width = innerWidth; H = cv.height = innerHeight;
+    pts = Array.from({ length: Math.min(90, Math.floor(W * H / 16000)) }, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - .5) * .4, vy: (Math.random() - .5) * .4
+    }));
+  }
+  addEventListener('resize', size); size();
+  addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+  (function draw() {
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach((p, i) => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > W) p.vx *= -1;
+      if (p.y < 0 || p.y > H) p.vy *= -1;
+      ctx.beginPath(); ctx.arc(p.x, p.y, 1.6, 0, 7);
+      ctx.fillStyle = 'rgba(200,190,255,.7)'; ctx.fill();
+      for (let j = i + 1; j < pts.length; j++) {
+        const q = pts[j], d = Math.hypot(p.x - q.x, p.y - q.y);
+        if (d < 130) {
+          ctx.strokeStyle = `rgba(139,92,246,${.25 * (1 - d / 130)})`;
+          ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y); ctx.stroke();
+        }
+      }
+      const dm = Math.hypot(p.x - mouse.x, p.y - mouse.y);
+      if (dm < 170) {
+        ctx.strokeStyle = `rgba(34,211,238,${.5 * (1 - dm / 170)})`;
+        ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(mouse.x, mouse.y); ctx.stroke();
+      }
+    });
+    requestAnimationFrame(draw);
+  })();
+</script>
+</body>
+</html>
